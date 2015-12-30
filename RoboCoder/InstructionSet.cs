@@ -34,13 +34,13 @@ namespace RoboCoder
             else
             {
                 Match<KeyEventArgs, string>.NoResult(args)
-                    .Or(InstructionCode)
-                    .Or(Symbol)
-                    .Or(Letter)
-                    .Or(Digit)
-                    .Or(NumberPadOperator)
-                    .Or(NumberPadDigit)
-                    .Or(FunctionKey)
+                    .Or(Shift(Ctrl(Alt(InstructionCode))))
+                    .Or(Ctrl(Alt(Symbol)))
+                    .Or(Ctrl(Alt(Letter)))
+                    .Or(Ctrl(Alt(Digit)))
+                    .Or(Shift(Ctrl(Alt(NumberPadOperator))))
+                    .Or(Shift(Ctrl(Alt(NumberPadDigit))))
+                    .Or(Shift(Ctrl(Alt(FunctionKey))))
                     .OnMatch(delegate (string code)
                     {
                         if (_instructions.Count > 0 && IsTextInstruction(_instructions[_instructions.Count - 1]))
@@ -58,6 +58,45 @@ namespace RoboCoder
         private static bool IsTextInstruction(string instruction)
         {
             return instruction != "{ENTER}";
+        }
+
+        private Func<KeyEventArgs, Match<KeyEventArgs, string>> Shift(Func<KeyEventArgs, Match<KeyEventArgs, string>> matcher)
+        {
+            return args =>
+            {
+                Match<KeyEventArgs, string> match = matcher(args);
+                if (args.Shift)
+                    return match.OnMatch(value => Match<KeyEventArgs, string >.Result(args,
+                        "+" + value));
+                else
+                    return match;
+            };
+        }
+
+        private Func<KeyEventArgs, Match<KeyEventArgs, string>> Ctrl(Func<KeyEventArgs, Match<KeyEventArgs, string>> matcher)
+        {
+            return args =>
+            {
+                Match<KeyEventArgs, string> match = matcher(args);
+                if (args.Control)
+                    return match.OnMatch(value => Match<KeyEventArgs, string >.Result(args,
+                        "^" + value));
+                else
+                    return match;
+            };
+        }
+
+        private Func<KeyEventArgs, Match<KeyEventArgs, string>> Alt(Func<KeyEventArgs, Match<KeyEventArgs, string>> matcher)
+        {
+            return args =>
+            {
+                Match<KeyEventArgs, string> match = matcher(args);
+                if (args.Alt)
+                    return match.OnMatch(value => Match<KeyEventArgs, string >.Result(args,
+                        "%" + value));
+                else
+                    return match;
+            };
         }
 
         private Match<KeyEventArgs, string> Letter(KeyEventArgs args)

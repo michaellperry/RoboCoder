@@ -43,5 +43,12 @@ namespace RoboCoder
                 action(_result);
             return this;
         }
+
+        public Match<A, T> OnMatch(Func<T, Match<A, T>> function)
+        {
+            if (_match)
+                return function(_result);
+            return this;
+        }
     }
 }
