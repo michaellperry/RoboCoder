@@ -9,12 +9,21 @@
         Loaded="Window_Loaded"
         Unloaded="Window_Unloaded"
         Title="MainWindow" Height="350" Width="525">
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding Record}" Gesture="Shift+Ctrl+F7" HotkeyManager.RegisterGlobalHotkey="True" />
+        <KeyBinding Command="{Binding Stop}" Gesture="Shift+Ctrl+F8" HotkeyManager.RegisterGlobalHotkey="True" />
+        <KeyBinding Command="{Binding Play}" Gesture="Shift+Ctrl+F9" HotkeyManager.RegisterGlobalHotkey="True" />
+    </Window.InputBindings>
     <Grid Margin="5">
         <Grid.RowDefinitions>
-            <RowDefinition Height="17*"/>
-            <RowDefinition Height="143*"/>
+            <RowDefinition Height="35"/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
 
+        <StackPanel Orientation="Horizontal" Margin="0,0,-0.333,1">
+            <Button Margin="5" Width="70" Click="File_Click">_File</Button>
+            <ToggleButton Margin="5" Width="70" IsChecked="{Binding Recording, Mode=TwoWay}">_Record</ToggleButton>
+        </StackPanel>
         <TextBox x:Name="ScriptTextBox" Grid.Row="1" Margin="5" Text="{Binding Instructions, Mode=TwoWay}" AcceptsReturn="True" TextChanged="ScriptTextBox_TextChanged"/>
     </Grid>
 </Window>

@@ -1,5 +1,6 @@
 ﻿using Assisticant;
 using Gma.System.MouseKeyHook;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,23 +18,6 @@ namespace RoboCoder
         public MainWindow()
         {
             InitializeComponent();
-        }
-
-        private void Go_Click(object sender, RoutedEventArgs e)
-        {
-            Thread.Sleep(1000);
-            System.Windows.Forms.SendKeys.SendWait("{ENTER}");
-            System.Windows.Forms.SendKeys.SendWait("{ENTER}");
-            System.Windows.Forms.SendKeys.SendWait("public override void BeginIni");
-            System.Windows.Forms.SendKeys.SendWait("{ENTER}");
-            Thread.Sleep(1000);
-            System.Windows.Forms.SendKeys.SendWait("{UP}");
-            System.Windows.Forms.SendKeys.SendWait("{ENTER}");
-            Thread.Sleep(1000);
-            System.Windows.Forms.SendKeys.SendWait("this.AddTe");
-            System.Windows.Forms.SendKeys.SendWait("{ENTER}");
-            Thread.Sleep(1000);
-            System.Windows.Forms.SendKeys.SendWait("{(}\"Hello, World!\"{)};");
         }
 
         private IKeyboardMouseEvents m_GlobalHook;
@@ -68,9 +52,24 @@ namespace RoboCoder
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
+            ForView.Unwrap<MainViewModel>(DataContext, vm => vm.Close());
             m_GlobalHook.KeyDown -= GlobalHookKeyDown;
 
             m_GlobalHook.Dispose();
+        }
+
+        private void File_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog()
+            {
+                DefaultExt = "scr",
+                Title = "RoboCoder"
+            };
+
+            if (dialog.ShowDialog() ?? false)
+            {
+                ForView.Unwrap<MainViewModel>(DataContext, vm => vm.OpenFile(dialog.FileName));
+            }
         }
     }
 }

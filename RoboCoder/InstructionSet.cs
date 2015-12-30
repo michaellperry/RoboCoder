@@ -1,4 +1,5 @@
 ﻿using Assisticant.Collections;
+using Assisticant.Fields;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -6,12 +7,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
+using System.Threading;
 
 namespace RoboCoder
 {
     class InstructionSet
     {
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        static extern short GetKeyState(int key);
+
         private ObservableList<string> _instructions = new ObservableList<string>();
+        private Observable<bool> _recording = new Observable<bool>();
+        private Observable<string> _fileName = new Observable<string>();
         private static KeysConverter _converter = new KeysConverter();
 
         public ImmutableList<string> Instructions
@@ -19,14 +27,47 @@ namespace RoboCoder
             get { return _instructions.ToImmutableList(); }
         }
 
+        public void OpenFile(string fileName)
+        {
+            _fileName.Value = fileName;
+            if (File.Exists(fileName))
+            {
+                _instructions.Clear();
+                using (var reader = new StreamReader(File.OpenRead(fileName)))
+                {
+                    while (!reader.EndOfStream)
+                    {
+                        var line = reader.ReadLine();
+                        _instructions.Add(line);
+                    }
+                }
+            }
+            else
+            {
+                Save();
+            }
+            _recording.Value = false;
+        }
+
         public void SetInstructions(ImmutableList<string> instructions)
         {
             _instructions.Clear();
             _instructions.AddRange(instructions);
+
+            Save();
+        }
+
+        public bool Recording
+        {
+            get { return _recording.Value; }
+            set { _recording.Value = value; }
         }
 
         public void AppendKey(KeyEventArgs args)
         {
+            if (!_recording.Value)
+                return;
+
             if (args.KeyCode == Keys.Enter)
             {
                 _instructions.Add("{ENTER}");
@@ -52,6 +93,34 @@ namespace RoboCoder
                             _instructions.Add(code);
                         }
                     });
+            }
+        }
+
+        public void Play()
+        {
+            while (IsControlKeyDown() || IsShiftKeyDown() || IsAltKeyDown())
+                Thread.Sleep(500);
+
+            foreach (var instruction in _instructions)
+            {
+                if (string.IsNullOrEmpty(instruction))
+                    Thread.Sleep(500);
+                else
+                    SendKeys.SendWait(instruction);
+            }
+        }
+
+        public void Save()
+        {
+            if (!string.IsNullOrEmpty(_fileName.Value))
+            {
+                using (var writer = new StreamWriter(File.OpenWrite(_fileName.Value)))
+                {
+                    foreach (var line in _instructions)
+                    {
+                        writer.WriteLine(line);
+                    }
+                }
             }
         }
 
@@ -270,5 +339,22 @@ namespace RoboCoder
                     return Match<KeyEventArgs, string>.NoResult(args);
             }
         }
+
+        private static bool IsControlKeyDown()
+        {
+            return (GetKeyState(VK_CONTROL) & KEY_PRESSED) != 0;
+        }
+        private static bool IsShiftKeyDown()
+        {
+            return (GetKeyState(VK_SHIFT) & KEY_PRESSED) != 0;
+        }
+        private static bool IsAltKeyDown()
+        {
+            return (GetKeyState(VK_MENU) & KEY_PRESSED) != 0;
+        }
+        private const int KEY_PRESSED = 0x8000;
+        private const int VK_SHIFT = 0x10;
+        private const int VK_CONTROL = 0x11;
+        private const int VK_MENU = 0x12;
     }
 }
