@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Threading;
-
+using System.Windows.Threading;
 namespace RoboCoder
 {
     class InstructionSet
@@ -22,6 +22,7 @@ namespace RoboCoder
         private Observable<string> _fileName = new Observable<string>();
         private Observable<int> _playhead = new Observable<int>();
         private Observable<string> _error = new Observable<string>();
+        private bool _playQueued;
 
         public ImmutableList<string> Instructions
         {
@@ -107,27 +108,25 @@ namespace RoboCoder
 
         public void Play()
         {
-            try
-            {
-                _error.Value = null;
-                while (IsControlKeyDown() || IsShiftKeyDown())
-                    Thread.Sleep(500);
+            _error.Value = null;
+            _playQueued = true;
+        }
 
-                int playhead = _playhead.Value;
-                while (playhead < _instructions.Count)
-                {
-                    var instruction = _instructions[playhead];
-                    playhead++;
-                    if (string.IsNullOrEmpty(instruction))
-                        break;
-                    else
-                        SendKeys.SendWait(instruction);
-                }
-                _playhead.Value = playhead;
-            }
-            catch (Exception x)
+        public void KetUp(KeyEventArgs args)
+        {
+            if (_playQueued)
             {
-                _error.Value = x.Message;
+                if ((!args.Shift && !args.Alt && (
+                    args.KeyCode == Keys.ControlKey ||
+                    args.KeyCode == Keys.LControlKey ||
+                    args.KeyCode == Keys.RControlKey)) ||
+                    (!args.Control && !args.Alt && (
+                    args.KeyCode == Keys.ShiftKey ||
+                    args.KeyCode == Keys.LShiftKey ||
+                    args.KeyCode == Keys.RShiftKey)))
+                {
+                    Dispatcher.CurrentDispatcher.InvokeAsync(PlayWhenReady);
+                }
             }
         }
 
@@ -145,6 +144,28 @@ namespace RoboCoder
             }
         }
 
+        private void PlayWhenReady()
+        {
+            try
+            {
+                _playQueued = false;
+                int playhead = _playhead.Value;
+                while (playhead < _instructions.Count)
+                {
+                    var instruction = _instructions[playhead];
+                    playhead++;
+                    if (string.IsNullOrEmpty(instruction))
+                        break;
+                    else
+                        SendKeys.SendWait(instruction);
+                }
+                _playhead.Value = playhead;
+            }
+            catch (Exception x)
+            {
+                _error.Value = x.Message;
+            }
+        }
         private static bool IsTextInstruction(string instruction)
         {
             return instruction != "{ENTER}";

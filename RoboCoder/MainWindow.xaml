@@ -25,7 +25,13 @@
             <ToggleButton Margin="5" Width="70" IsChecked="{Binding Recording, Mode=TwoWay}">_Record</ToggleButton>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Ellipse Width="25" Height="25" VerticalAlignment="Center" Margin="5" Fill="#B22222" ToolTip="{Binding Error}" ToolTipService.ShowOnDisabled="True" Visibility="{Binding HasError, Converter={StaticResource VisibleWhenTrue}}"/>
+            <Button Width="25" Height="25" VerticalAlignment="Center" Margin="5" Visibility="{Binding HasError, Converter={StaticResource VisibleWhenTrue}}" ToolTip="{Binding Error}" Click="Error_Click">
+                <Button.Template>
+                    <ControlTemplate>
+                        <Ellipse Fill="Firebrick"/>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
         </StackPanel>
         <TextBox x:Name="ScriptTextBox" Grid.Row="1" Margin="5" Text="{Binding Instructions, Mode=TwoWay}" AcceptsReturn="True" TextChanged="ScriptTextBox_TextChanged" VerticalScrollBarVisibility="Auto"/>
     </Grid>

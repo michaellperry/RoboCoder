@@ -35,6 +35,11 @@ namespace RoboCoder
             _instructionSet.AppendKey(args);
         }
 
+        public void KeyUp(KeyEventArgs args)
+        {
+            _instructionSet.KetUp(args);
+        }
+
         public bool Recording
         {
             get { return _instructionSet.Recording; }

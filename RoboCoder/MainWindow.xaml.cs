@@ -20,7 +20,7 @@ namespace RoboCoder
             InitializeComponent();
         }
 
-        private IKeyboardMouseEvents m_GlobalHook;
+        private IKeyboardMouseEvents _globalHook;
         private bool _modified;
 
         private void ScriptTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -43,19 +43,27 @@ namespace RoboCoder
             }
         }
 
+        private void GlobalHookKeyUp(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            if (!IsKeyboardFocusWithin)
+                ForView.Unwrap<MainViewModel>(DataContext, vm => vm.KeyUp(e));
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            m_GlobalHook = Hook.GlobalEvents();
+            _globalHook = Hook.GlobalEvents();
 
-            m_GlobalHook.KeyDown += GlobalHookKeyDown;
+            _globalHook.KeyDown += GlobalHookKeyDown;
+            _globalHook.KeyUp += GlobalHookKeyUp;
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
             ForView.Unwrap<MainViewModel>(DataContext, vm => vm.Close());
-            m_GlobalHook.KeyDown -= GlobalHookKeyDown;
+            _globalHook.KeyDown -= GlobalHookKeyDown;
+            _globalHook.KeyUp -= GlobalHookKeyUp;
 
-            m_GlobalHook.Dispose();
+            _globalHook.Dispose();
         }
 
         private void File_Click(object sender, RoutedEventArgs e)
@@ -71,6 +79,12 @@ namespace RoboCoder
             {
                 ForView.Unwrap<MainViewModel>(DataContext, vm => vm.OpenFile(dialog.FileName));
             }
+        }
+
+        private void Error_Click(object sender, RoutedEventArgs e)
+        {
+            ForView.Unwrap<MainViewModel>(DataContext, vm =>
+                MessageBox.Show(vm.Error, "RoboCoder"));
         }
     }
 }
