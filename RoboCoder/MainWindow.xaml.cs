@@ -63,7 +63,8 @@ namespace RoboCoder
             OpenFileDialog dialog = new OpenFileDialog()
             {
                 DefaultExt = "scr",
-                Title = "RoboCoder"
+                Title = "RoboCoder",
+                CheckFileExists = false
             };
 
             if (dialog.ShowDialog() ?? false)

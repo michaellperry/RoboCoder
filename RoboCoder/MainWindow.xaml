@@ -20,10 +20,13 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Margin="0,0,-0.333,1">
+        <StackPanel Orientation="Horizontal">
             <Button Margin="5" Width="70" Click="File_Click">_File</Button>
             <ToggleButton Margin="5" Width="70" IsChecked="{Binding Recording, Mode=TwoWay}">_Record</ToggleButton>
         </StackPanel>
-        <TextBox x:Name="ScriptTextBox" Grid.Row="1" Margin="5" Text="{Binding Instructions, Mode=TwoWay}" AcceptsReturn="True" TextChanged="ScriptTextBox_TextChanged"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Ellipse Width="25" Height="25" VerticalAlignment="Center" Margin="5" Fill="#B22222" ToolTip="{Binding Error}" ToolTipService.ShowOnDisabled="True" Visibility="{Binding HasError, Converter={StaticResource VisibleWhenTrue}}"/>
+        </StackPanel>
+        <TextBox x:Name="ScriptTextBox" Grid.Row="1" Margin="5" Text="{Binding Instructions, Mode=TwoWay}" AcceptsReturn="True" TextChanged="ScriptTextBox_TextChanged" VerticalScrollBarVisibility="Auto"/>
     </Grid>
 </Window>

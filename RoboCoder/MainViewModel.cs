@@ -69,5 +69,15 @@ namespace RoboCoder
         {
             _instructionSet.Save();
         }
+
+        public string Error
+        {
+            get { return _instructionSet.Error; }
+        }
+
+        public bool HasError
+        {
+            get { return !string.IsNullOrEmpty(_instructionSet.Error); }
+        }
     }
 }

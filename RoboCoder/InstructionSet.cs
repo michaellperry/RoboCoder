@@ -20,7 +20,8 @@ namespace RoboCoder
         private ObservableList<string> _instructions = new ObservableList<string>();
         private Observable<bool> _recording = new Observable<bool>();
         private Observable<string> _fileName = new Observable<string>();
-        private static KeysConverter _converter = new KeysConverter();
+        private Observable<int> _playhead = new Observable<int>();
+        private Observable<string> _error = new Observable<string>();
 
         public ImmutableList<string> Instructions
         {
@@ -47,6 +48,7 @@ namespace RoboCoder
                 Save();
             }
             _recording.Value = false;
+            _playhead.Value = 0;
         }
 
         public void SetInstructions(ImmutableList<string> instructions)
@@ -54,6 +56,7 @@ namespace RoboCoder
             _instructions.Clear();
             _instructions.AddRange(instructions);
 
+            _playhead.Value = 0;
             Save();
         }
 
@@ -61,6 +64,11 @@ namespace RoboCoder
         {
             get { return _recording.Value; }
             set { _recording.Value = value; }
+        }
+
+        public string Error
+        {
+            get { return _error.Value; }
         }
 
         public void AppendKey(KeyEventArgs args)
@@ -72,7 +80,7 @@ namespace RoboCoder
             {
                 _instructions.Add("{ENTER}");
             }
-            else
+            else if (!IsHotKey(args))
             {
                 Match<KeyEventArgs, string>.NoResult(args)
                     .Or(Shift(Ctrl(Alt(InstructionCode))))
@@ -94,19 +102,32 @@ namespace RoboCoder
                         }
                     });
             }
+            _playhead.Value = 0;
         }
 
         public void Play()
         {
-            while (IsControlKeyDown() || IsShiftKeyDown() || IsAltKeyDown())
-                Thread.Sleep(500);
-
-            foreach (var instruction in _instructions)
+            try
             {
-                if (string.IsNullOrEmpty(instruction))
+                _error.Value = null;
+                while (IsControlKeyDown() || IsShiftKeyDown())
                     Thread.Sleep(500);
-                else
-                    SendKeys.SendWait(instruction);
+
+                int playhead = _playhead.Value;
+                while (playhead < _instructions.Count)
+                {
+                    var instruction = _instructions[playhead];
+                    playhead++;
+                    if (string.IsNullOrEmpty(instruction))
+                        break;
+                    else
+                        SendKeys.SendWait(instruction);
+                }
+                _playhead.Value = playhead;
+            }
+            catch (Exception x)
+            {
+                _error.Value = x.Message;
             }
         }
 
@@ -127,6 +148,15 @@ namespace RoboCoder
         private static bool IsTextInstruction(string instruction)
         {
             return instruction != "{ENTER}";
+        }
+
+        private static bool IsHotKey(KeyEventArgs args)
+        {
+            return
+                args.KeyCode == Keys.F8 &&
+                args.Shift &&
+                args.Control &&
+                !args.Alt;
         }
 
         private Func<KeyEventArgs, Match<KeyEventArgs, string>> Shift(Func<KeyEventArgs, Match<KeyEventArgs, string>> matcher)
@@ -304,7 +334,7 @@ namespace RoboCoder
                 case Keys.Tab:
                     return Match<KeyEventArgs, string>.Result(args, "{TAB}");
                 case Keys.Back:
-                    return Match<KeyEventArgs, string>.Result(args, "{BACK}");
+                    return Match<KeyEventArgs, string>.Result(args, "{BS}");
                 case Keys.CapsLock:
                     return Match<KeyEventArgs, string>.Result(args, "{CAPSLOCK}");
                 case Keys.Escape:
