@@ -14,9 +14,6 @@ namespace RoboCoder
 {
     class InstructionSet
     {
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
-        static extern short GetKeyState(int key);
-
         private ObservableList<string> _instructions = new ObservableList<string>();
         private Observable<bool> _recording = new Observable<bool>();
         private Observable<string> _fileName = new Observable<string>();
@@ -390,22 +387,5 @@ namespace RoboCoder
                     return Match<KeyEventArgs, string>.NoResult(args);
             }
         }
-
-        private static bool IsControlKeyDown()
-        {
-            return (GetKeyState(VK_CONTROL) & KEY_PRESSED) != 0;
-        }
-        private static bool IsShiftKeyDown()
-        {
-            return (GetKeyState(VK_SHIFT) & KEY_PRESSED) != 0;
-        }
-        private static bool IsAltKeyDown()
-        {
-            return (GetKeyState(VK_MENU) & KEY_PRESSED) != 0;
-        }
-        private const int KEY_PRESSED = 0x8000;
-        private const int VK_SHIFT = 0x10;
-        private const int VK_CONTROL = 0x11;
-        private const int VK_MENU = 0x12;
     }
 }

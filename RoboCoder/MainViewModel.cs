@@ -25,7 +25,7 @@ namespace RoboCoder
             }
             set
             {
-                var lines = value.Split('\n');
+                var lines = value.Replace("\r", "").Split('\n');
                 _instructionSet.SetInstructions(lines.ToImmutableList());
             }
         }
