@@ -8,7 +8,7 @@
         DataContext="{Binding Source={StaticResource Locator}, Path=Main}"
         Loaded="Window_Loaded"
         Unloaded="Window_Unloaded"
-        Title="MainWindow" Height="350" Width="525">
+        Title="RoboCoder" Height="350" Width="525">
     <Window.InputBindings>
         <KeyBinding Command="{Binding Record}" Gesture="Shift+Ctrl+F7" HotkeyManager.RegisterGlobalHotkey="True" />
         <KeyBinding Command="{Binding Stop}" Gesture="Shift+Ctrl+F8" HotkeyManager.RegisterGlobalHotkey="True" />
