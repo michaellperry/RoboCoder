@@ -76,7 +76,14 @@ namespace RoboCoder
 
             if (args.KeyCode == Keys.Enter)
             {
-                _instructions.Add("{ENTER}");
+                if (_instructions.Count > 0 && _instructions[_instructions.Count - 1] == String.Empty)
+                {
+                    _instructions[_instructions.Count - 1] = "{ENTER}";
+                }
+                else
+                {
+                    _instructions.Add("{ENTER}");
+                }
             }
             else if (!IsHotKey(args))
             {
@@ -150,6 +157,15 @@ namespace RoboCoder
             {
                 _playQueued = false;
                 int playhead = _playhead.Value;
+                // Skip extra blank lines.
+                while (playhead < _instructions.Count)
+                {
+                    var instruction = _instructions[playhead];
+                    if (!string.IsNullOrEmpty(instruction))
+                        break;
+                    playhead++;
+                }
+                // Play until the next blank line.
                 while (playhead < _instructions.Count)
                 {
                     var instruction = _instructions[playhead];
