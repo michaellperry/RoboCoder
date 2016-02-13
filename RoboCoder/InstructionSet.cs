@@ -131,7 +131,10 @@ namespace RoboCoder
         {
             if (!string.IsNullOrEmpty(_fileName.Value))
             {
-                using (var writer = new StreamWriter(File.OpenWrite(_fileName.Value)))
+                var fileMode = File.Exists(_fileName.Value) ?
+                    FileMode.Truncate :
+                    FileMode.Create;
+                using (var writer = new StreamWriter(File.Open(_fileName.Value, fileMode)))
                 {
                     foreach (var line in _instructions)
                     {
