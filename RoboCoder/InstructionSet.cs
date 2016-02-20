@@ -97,17 +97,39 @@ namespace RoboCoder
                     .Or(Shift(Ctrl(Alt(FunctionKey))))
                     .OnMatch(delegate (string code)
                     {
-                        if (_instructions.Count > 0 && IsTextInstruction(_instructions[_instructions.Count - 1]))
+                        if (_instructions.Count == 0)
                         {
-                            _instructions[_instructions.Count - 1] = _instructions[_instructions.Count - 1] + code;
+                            _instructions.Add(code);
                         }
                         else
                         {
-                            _instructions.Add(code);
+                            string lastInstruction = _instructions[_instructions.Count - 1];
+                            if (code == "{BS}" && lastInstruction.Length > 0 && char.IsLetterOrDigit(lastInstruction[lastInstruction.Length - 1]))
+                            {
+                                _instructions[_instructions.Count - 1] = lastInstruction.Substring(0, lastInstruction.Length - 1);
+                            }
+                            else if (IsTextInstruction(lastInstruction))
+                            {
+                                _instructions[_instructions.Count - 1] = lastInstruction + code;
+                            }
+                            else
+                            {
+                                _instructions.Add(code);
+                            }
                         }
                     });
             }
             _playhead.Value = 0;
+        }
+
+        public void Pause()
+        {
+            if (_instructions.Count > 0 &&
+                _instructions[_instructions.Count - 1] != string.Empty)
+            {
+                _instructions.Add(string.Empty);
+                _instructions.Add(string.Empty);
+            }
         }
 
         public void Play()

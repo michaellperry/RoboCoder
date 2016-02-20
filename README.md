@@ -38,9 +38,9 @@ Create a Git branch at the starting point of your demo. You will need to reset t
 
 Check your scripts into Git. They're just text! But keep them in a separate repository than the code so that you can reset one without loosing the other.
 
-## Roadmap
+If you make a mistake, use Backspace. If you hit Backspace and the last keystroke was a character, then RoboCoder will just delete that character from the script; it won't insert a Backspace.
 
-If you hit Backspace and the last keystroke was a character, then just delete that character from the script; don't insert a Backspace.
+## Roadmap
 
 Give some indication of where you are in the script during playback.
 

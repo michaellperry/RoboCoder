@@ -58,6 +58,7 @@ namespace RoboCoder
         public void Stop()
         {
             _instructionSet.Recording = false;
+            _instructionSet.Pause();
         }
 
         public void Play()
