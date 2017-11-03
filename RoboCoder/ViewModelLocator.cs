@@ -9,11 +9,12 @@ namespace RoboCoder
 {
     class ViewModelLocator : ViewModelLocatorBase
     {
-        private InstructionSet _instructionSet = new InstructionSet();
+        private static readonly Typer _typer = new Typer();
+        private readonly InstructionSet _instructionSet = new InstructionSet(_typer);
 
         public object Main
         {
-            get { return ViewModel(() => new MainViewModel(_instructionSet)); }
+            get { return ViewModel(() => new MainViewModel(_instructionSet, _typer)); }
         }
     }
 }

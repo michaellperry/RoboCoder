@@ -23,6 +23,9 @@
         <StackPanel Orientation="Horizontal">
             <Button Margin="5" Width="70" Click="File_Click">_File</Button>
             <ToggleButton Margin="5" Width="70" IsChecked="{Binding Recording, Mode=TwoWay}">_Record</ToggleButton>
+                        
+            <TextBlock Margin="5" VerticalAlignment="Center">Typing Speed</TextBlock>
+            <Slider Margin="5" VerticalAlignment="Center" AutoToolTipPlacement="BottomRight" AutoToolTipPrecision="2" IsSnapToTickEnabled="True" Value="{Binding Speed, Mode=TwoWay}" Maximum="1" Minimum="0" TickFrequency="0.1" Width="93"></Slider>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Width="25" Height="25" VerticalAlignment="Center" Margin="5" Visibility="{Binding HasError, Converter={StaticResource VisibleWhenTrue}}" ToolTip="{Binding Error}" Click="Error_Click">
