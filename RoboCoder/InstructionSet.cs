@@ -19,7 +19,13 @@ namespace RoboCoder
         private Observable<string> _fileName = new Observable<string>();
         private Observable<int> _playhead = new Observable<int>();
         private Observable<string> _error = new Observable<string>();
+        private readonly Typer _typer;
         private bool _playQueued;
+
+        public InstructionSet(Typer typer)
+        {
+            _typer = typer;
+        }
 
         public ImmutableList<string> Instructions
         {
@@ -57,7 +63,7 @@ namespace RoboCoder
             _playhead.Value = 0;
             Save();
         }
-
+        
         public bool Recording
         {
             get { return _recording.Value; }
@@ -195,7 +201,7 @@ namespace RoboCoder
                     if (string.IsNullOrEmpty(instruction))
                         break;
                     else
-                        SendKeys.SendWait(instruction);
+                        _typer.Type(instruction);
                 }
                 _playhead.Value = playhead;
             }

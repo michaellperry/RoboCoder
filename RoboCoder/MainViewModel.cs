@@ -5,18 +5,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Assisticant.Fields;
 
 namespace RoboCoder
 {
     class MainViewModel
     {
+        private readonly Observable<double> _speed = new Observable<double>(1);
         private readonly InstructionSet _instructionSet;
+        private readonly Typer _typer;
 
-        public MainViewModel(InstructionSet instructionSet)
+        public MainViewModel(InstructionSet instructionSet, Typer typer)
         {
             _instructionSet = instructionSet;
+            _typer = typer;
         }
-
+        
         public string Instructions
         {
             get
@@ -49,6 +53,15 @@ namespace RoboCoder
                 _instructionSet.Save();
             }
         }
+       
+        public double Speed
+        {
+            get { return _speed.Value; }
+            set
+            {
+                _speed.Value = value;
+            }
+        }
 
         public void Record()
         {
@@ -63,6 +76,7 @@ namespace RoboCoder
 
         public void Play()
         {
+            _typer.SetSpeed(Speed);
             _instructionSet.Play();
         }
 
